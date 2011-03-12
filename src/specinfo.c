@@ -1,9 +1,14 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <libgen.h>
+#include <dirent.h>
+
 #include <rpmcli.h>
-#include <rpmpgp.h>
 #include <rpmdb.h>
 #include <rpmbuild.h>
+
+#include "config.h"
+#include "specinfo.h"
 
 void usage(char **argv) {
     fprintf(stderr, "%s [<options>] <spec file>\n\n", argv[0]);
@@ -26,8 +31,10 @@ void loadMacros(char *macrodir) {
         exit(1);
     }
 
-    getcwd(oldcwd, size);
-    chdir(macrodir);
+    if (getcwd(oldcwd, size) == NULL)
+        return;
+    if (chdir(macrodir) != 0)
+        return;
     while ((ep = readdir(dp))) {
         if (!stat(ep->d_name, &fileinfo)) {
             if (S_ISREG(fileinfo.st_mode)) {
@@ -35,7 +42,8 @@ void loadMacros(char *macrodir) {
             }
         }
     }
-    chdir(oldcwd);
+    if (chdir(oldcwd) != 0)
+        return;
 }
 
 int main(int argc, char **argv) {
@@ -107,7 +115,11 @@ int main(int argc, char **argv) {
     }
 
     // Parse spec
+#ifdef _RPM_4_4_COMPAT
+    if ((spec = rpmtsSpec(ts)) == NULL) {
+#else
     if ((spec = rpmtsSpec(ts, NULL)) == NULL) {
+#endif
         fprintf(stderr, "rpmtsSpec fail\n");
         return 1;
     }

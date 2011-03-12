@@ -1,14 +1,14 @@
-INCLUDE = /usr/include/rpm
-OBJECTS = specinfo.o
+INCLUDE = -I$(shell pwd)/include -I/usr/include/rpm
+OBJECTS = src/config.o src/specinfo.o
 TARGET  = specinfo
 CFLAGS  = -O2
 LIBS    = -lrpm -lrpmbuild
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) -I$(INCLUDE) $(LIBS) $(OBJECTS) -o $(TARGET)
+	$(CC) $(CFLAGS) $(INCLUDE) $(LIBS) $(OBJECTS) -o $(TARGET)
 
-%.o: src/%.c
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c $<
+src/%.o: src/%.c
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
 	$(RM) $(OBJECTS)
