@@ -1,0 +1,14 @@
+INCLUDE = /usr/include/rpm
+OBJECTS = specinfo.o
+TARGET  = specinfo
+CFLAGS  = -O2
+LIBS    = -lrpm -lrpmbuild
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -I$(INCLUDE) $(LIBS) $(OBJECTS) -o $(TARGET)
+
+%.o: src/%.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $<
+
+clean:
+	$(RM) $(OBJECTS)
