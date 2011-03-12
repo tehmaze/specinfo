@@ -46,6 +46,14 @@ void loadMacros(char *macrodir) {
         return;
 }
 
+char *expandOneMacro(const char * arg) {
+    char *expanded = rpmExpand(arg, NULL);
+    if (strstr(arg, expanded)) {
+        expanded = "\x00";
+    }
+    return expanded;
+}
+
 int main(int argc, char **argv) {
     rpmts ts;
     int macrodirc = 0;
@@ -129,15 +137,15 @@ int main(int argc, char **argv) {
 
     // Output spec information
     printf("file:       %s\n", basename(specfile));
-    printf("name:       %s\n", rpmExpand("%{name}", NULL));
-    printf("version:    %s\n", rpmExpand("%{version}", NULL));
-    printf("release:    %s\n", rpmExpand("%{release}", NULL));
-    printf("group:      %s\n", rpmExpand("%{group}", NULL));
-    printf("license:    %s\n", rpmExpand("%{license}", NULL));
-    printf("summary:    %s\n", rpmExpand("%{summary}", NULL));
-    printf("requires:   %s\n", rpmExpand("%{requires}", NULL));
-    printf("provides:   %s\n", rpmExpand("%{provides}", NULL));
-    printf("obsoletes:  %s\n", rpmExpand("%{obsoletes}", NULL));
+    printf("name:       %s\n", expandOneMacro("%{name}"));
+    printf("version:    %s\n", expandOneMacro("%{version}"));
+    printf("release:    %s\n", expandOneMacro("%{release}"));
+    printf("group:      %s\n", expandOneMacro("%{group}"));
+    printf("license:    %s\n", expandOneMacro("%{license}"));
+    printf("summary:    %s\n", expandOneMacro("%{summary}"));
+    printf("requires:   %s\n", expandOneMacro("%{requires}"));
+    printf("provides:   %s\n", expandOneMacro("%{provides}"));
+    printf("obsoletes:  %s\n", expandOneMacro("%{obsoletes}"));
     //printf("conflicts:  %s\n", rpmExpand("%{conflicts}", NULL));
 
     // Cleanup
